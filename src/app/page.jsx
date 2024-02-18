@@ -20,9 +20,9 @@ export default function Home() {
         <DiffWord
           hide={!hide}
           string1={transformText(dictationInputContent)}
-          string2={transformText(transcript)} />
+          string2={transformText(transcript)}/>
         <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
-          <DialogSubmit hide={hide} setHide={setHide} />
+          <DialogSubmit hide={hide} setHide={setHide}/>
         </Grid>
       </div>
     </>

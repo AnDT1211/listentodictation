@@ -9,6 +9,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import TextField from "@mui/material/TextField";
 
 export default function DialogTranscriptRegister(props) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 767;
   const [open, setOpen] = React.useState(false);
   const [transcriptContent, setTranscriptContent] = React.useState("");
 
@@ -29,7 +30,8 @@ export default function DialogTranscriptRegister(props) {
     <React.Fragment>
       <Button component="label" variant="outlined" startIcon={<DescriptionIcon/>} sx={{marginRight: "1rem"}}
               onClick={handleClickOpen}>
-        Upload Transcript
+        {/*Upload Transcript*/}
+        Transcript
       </Button>
       <Dialog
         open={open}
@@ -41,7 +43,7 @@ export default function DialogTranscriptRegister(props) {
           Transcript Register
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" width={500}>
+          <DialogContentText id="alert-dialog-description" minWidth={isMobile ? 300 : 500}>
             <TextField
               autoFocus
               id="outlined-multiline-flexible"

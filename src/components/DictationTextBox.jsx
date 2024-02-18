@@ -2,9 +2,10 @@ import {Stack} from "@mui/material";
 import TextField from "@mui/material/TextField";
 
 export default function DictationTextBox(props) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 767;
   return <>
     <div hidden={props.hide}>
-      <Stack direction="row" spacing={2} className="my-5" >
+      <Stack direction="row" spacing={2} className="my-5">
         {/*{showTranscript()}*/}
         <div className="container mx-auto my-5">
           <TextField
@@ -12,7 +13,9 @@ export default function DictationTextBox(props) {
             id="outlined-multiline-flexible"
             label="Type what you are listen here."
             multiline
-            minRows={20}
+            minRows={10}
+            // maxRows={20}
+            maxRows={isMobile ? 10 : 20}
             fullWidth
             // value={props.content}
             value={props.content}
