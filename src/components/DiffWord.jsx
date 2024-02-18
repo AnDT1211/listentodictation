@@ -26,8 +26,13 @@ const DiffWord = ({string1 = "", string2 = "", mode = "words", hide = false}) =>
     groups = diff.diffSentences(string1, string2, {newlineIsToken: true});
 
   console.log(`mode ${mode} groups`, groups);
-  const mappedNodes = groups.map((group) => {
-    let {value, added, removed} = group;
+  const mappedNodes = groups.map((group, index) => {
+    let {value, added, removed, count} = group;
+    if (count === 0) {
+      // If count is 0, it means there are no differences in the words/characters.
+      // You can handle this case appropriately, such as skipping the rendering or showing a message.
+      return null;
+    }
     if ((added || removed) && !/\S/.test(value)) {
       const linebreaks = value.match(/(\r\n|\r|\n)/g);
       // console.log(`contains ${linebreaks.length} new line`, linebreaks);
@@ -39,13 +44,15 @@ const DiffWord = ({string1 = "", string2 = "", mode = "words", hide = false}) =>
     let nodeStyles;
     if (added) nodeStyles = styles.added;
     if (removed) nodeStyles = styles.removed;
-    return <><span style={nodeStyles}>{value}</span></>
+
+    const uniqueKey = `${index}-${value}`;
+    return <><span key={uniqueKey} style={nodeStyles}>{value}</span></>
   });
 
   return <>
     <div hidden={hide} className="pb-4 pt-4">
       <Box component="section" sx={{p: 2, border: '1px dashed grey'}}>
-        <span autoFocus={true} style={{whiteSpace: "pre"}}>{mappedNodes}</span>
+        <span autoFocus={true} style={{whiteSpace: "pre-wrap"}}>{mappedNodes}</span>
       </Box>
     </div>
   </>
