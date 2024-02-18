@@ -1,31 +1,32 @@
 "use client"
 
-import {Box, Button, IconButton, Slider, Stack} from "@mui/material";
+import {Box, Button, FormControlLabel, FormGroup, IconButton, Slider, Stack, Switch} from "@mui/material";
 import {useEffect, useRef, useState} from "react";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 
-import UploadFileIcon from "@mui/icons-material/UploadFile";
 import Grid from "@mui/material/Grid";
-import DialogTranscriptRegister from "@/components/audio/DialogTranscriptRegister";
 import DialogGuideController from "@/components/audio/DialogGuideController";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import DialogLinkRegister from "@/components/audio/DialogLinkRegister";
+import DialogTranscriptLinkRegister from "@/components/audio/DialogTranscriptLinkRegister";
+import ReactPlayer from "react-player";
 
 const MAX_VALUE_SLIDER = 10000;
 
-export default function AudioComp(props) {
+export default function AudioCompLink(props) {
   let aud = useRef(null);
   let [sliderVal, setSliderVal] = useState(0);
   let [second, setSecond] = useState(2);
   let [stateVal, setStateVal] = useState(0);
   let [duration, setDuration] = useState("");
+  let [durationSecond, setDurationSecond] = useState(0);
   let [currentTimeAud, setCurrentTimeAud] = useState("");
   let [isPlaying, setIsPlaying] = useState(false);
-  const [filename, setFilename] = useState("");
-
-
-  const [audio, setAudio] = useState();
+  const [link, setLink] = useState("");
+  const playerRef = useRef(null);
+  const [hideVideo, setHideVideo] = useState(true);
 
 
   useEffect(() => {
@@ -34,20 +35,9 @@ export default function AudioComp(props) {
   }, []);
 
   useEffect(() => {
-    if (isPlaying) {
-      aud.current?.play();
-    } else {
-      aud.current?.pause();
-    }
-    // console.log(aud.current?.currentTime + " - " + aud.current?.duration);
-  }, [isPlaying])
-
-  useEffect(() => {
-
     if (sliderVal === MAX_VALUE_SLIDER) {
       resetAll();
     }
-
 
     const callback = (event) => {
       // console.log(event.key)
@@ -66,21 +56,8 @@ export default function AudioComp(props) {
   })
 
   function timeAudioUpdateKeyTrigger(sec) {
-    if (aud.current?.currentTime + sec*second >= 0 && aud.current?.currentTime + sec*second <= aud.current?.duration) {
-      aud.current.currentTime = aud.current?.currentTime + sec*second;
-      let curTime = Math.round(aud.current?.currentTime);
-      let durTime = Math.round(aud.current?.duration);
-      setCurrentTimeAud(fmtMSS(curTime));
-
-      let curSlide = Math.round(curTime / durTime * MAX_VALUE_SLIDER);
-      if (curSlide !== sliderVal) {
-        setSliderVal(curSlide);
-      }
-
-      if (curTime === Math.round(aud.current?.duration)) {
-        setIsPlaying(!isPlaying);
-      }
-    }
+    const newTime = Math.max(0, playerRef.current.getCurrentTime() + second*(sec));
+    playerRef.current.seekTo(newTime);
   }
 
   function fmtMSS(s) {
@@ -94,38 +71,16 @@ export default function AudioComp(props) {
     e.preventDefault();
     setStateVal(stateVal + 1);
     setIsPlaying(!isPlaying);
-    if (!isNaN(aud.current.duration)) {
-      setDuration(fmtMSS(Math.round(aud.current.duration)));
-    }
-  }
-
-  function timeAudioUpdate() {
-    let curTime = Math.round(aud.current?.currentTime);
-    let durTime = Math.round(aud.current?.duration);
-    setCurrentTimeAud(fmtMSS(curTime));
-
-    let curSlide = Math.round(curTime / durTime * MAX_VALUE_SLIDER);
-    if (curSlide !== sliderVal) {
-      setSliderVal(curSlide);
-    }
-
-    if (curTime === Math.round(aud.current?.duration)) {
-      setIsPlaying(!isPlaying);
-    }
   }
 
   function handleUseChangeSlider(e) {
     setSliderVal(e.target.value);
-    let curTime = e.target.value / MAX_VALUE_SLIDER * aud.current?.duration;
-    try {
-      aud.current.currentTime = curTime;
-    } catch (exceptionVar) {
-      // catchStatements
-    }
+    let curTime = e.target.value / MAX_VALUE_SLIDER * playerRef.current.getDuration();
+    playerRef.current.seekTo(curTime, 'seconds');
   }
 
   function resetAll() {
-    aud.current?.pause();
+    // aud.current?.pause();
     setSliderVal(0);
     setCurrentTimeAud("0:00");
     setDuration("0:00");
@@ -134,29 +89,6 @@ export default function AudioComp(props) {
     }
   }
 
-  useEffect(() => {
-    resetAll();
-    aud.current = new Audio(audio);
-    aud.current.addEventListener("timeupdate", () => {
-      timeAudioUpdate()
-    }, false);
-  }, [audio]);
-
-
-  function addFile(e) {
-    if (e.target.files[0]) {
-      setAudio(URL.createObjectURL(e.target.files[0]));
-    }
-    // console.log("file name: " + e.target.files[0]?.name)
-    if (e.target.files[0] != null) {
-      let inputString = e.target.files[0]?.name;
-      const maxLengthName = 15;
-      if (inputString.length > maxLengthName) {
-        inputString = inputString.substring(0, maxLengthName);
-      }
-      setFilename(inputString.trim() + "...");
-    }
-  }
 
   return <>
     <Grid
@@ -170,15 +102,57 @@ export default function AudioComp(props) {
       <div hidden={props.hide}>
         {/*display file name*/}
         <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
-          <p>{filename}</p>
+          <p>{link}</p>
         </Grid>
-        <Button component="label" variant="outlined" startIcon={<UploadFileIcon/>} sx={{marginRight: "1rem"}}>
-          {/*Upload Audio*/}
-          Audio
-          <input type="file" accept=".mp3" hidden onChange={addFile}/>
-        </Button>
-        <DialogTranscriptRegister addTranscript={props.addTranscript}/>
+        <div className="pt-7">
+          <Grid container spacing={2} direction="row" alignItems="center" justifyContent="center">
+            <DialogLinkRegister setLink={setLink}/>
+            <DialogTranscriptLinkRegister addTranscript={props.addTranscript}/>
+            <FormGroup>
+              <FormControlLabel control={<Switch onChange={() => setHideVideo(!hideVideo)}/>} label="Show Video"/>
+            </FormGroup>
+          </Grid>
+        </div>
       </div>
+    </Grid>
+
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      // sx={{ minHeight: '100vh' }}
+    >
+
+      <div hidden={hideVideo} className="pt-3">
+        <ReactPlayer
+          ref={playerRef}
+          url={link}
+          controls={false}
+          // playing
+          playing={isPlaying}
+          width="100%"
+          height="100%"
+          onDuration={(duration) => {
+            setDuration(fmtMSS(Math.round(duration)));
+            setDurationSecond(duration);
+          }}
+
+          onProgress={(e) => {
+            setCurrentTimeAud(fmtMSS(Math.round(e.playedSeconds)));
+            // set slide value
+            let curTime = Math.round(e.playedSeconds);
+            let durTime = Math.round(durationSecond);
+
+            let curSlide = Math.round(curTime / durTime * MAX_VALUE_SLIDER);
+            if (curSlide !== sliderVal) {
+              setSliderVal(curSlide);
+            }
+          }}
+        />
+      </div>
+
     </Grid>
 
     <Stack py={2} direction="row" spacing={2} justifyContent="center" alignItems="center">
@@ -189,7 +163,6 @@ export default function AudioComp(props) {
         {currentTimeAud}
       </Box>
 
-
       {/*audio bar controller*/}
       <Box display="flex" justifyContent="center" alignItems="center" height={20} width={500}>
         <Slider value={sliderVal} max={MAX_VALUE_SLIDER} onChange={handleUseChangeSlider}/>
@@ -199,7 +172,6 @@ export default function AudioComp(props) {
       <Box sx={{display: {xs: 'block'}}} width={50}>
         {duration}
       </Box>
-
 
     </Stack>
     <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
@@ -230,18 +202,4 @@ export default function AudioComp(props) {
 
   </>
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

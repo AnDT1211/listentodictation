@@ -16,9 +16,12 @@ import {Typography} from '@mui/material';
 import KeyboardOptionKeyIcon from '@mui/icons-material/KeyboardOptionKey';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import QuantityInput from "@/components/audio/QuantityInput";
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
 
 
-export default function DialogGuideController() {
+export default function DialogGuideController(props) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -90,6 +93,32 @@ export default function DialogGuideController() {
                   </Box>
                 </Box>
                 <Box sx={{height: 26, textAlign: "center"}}> to FORWARD</Box>
+              </Grid>
+            </Stack>
+
+            <Stack container direction="row" justifyContent="center" alignItems="center" gap={1}>
+              <Grid container direction="row" justifyContent="left" alignItems="center" gap={1}>
+                <Box sx={{height: 26, textAlign: "center"}}>Move</Box>
+                <div>
+
+
+                  <IconButton size="small" aria-label="Minus" onClick={() => {
+                    if(props.second !== 1) {
+                      props.setSecond(props.second - 1)
+                    }
+                  }}>
+                    <RemoveIcon/>
+                  </IconButton>
+                  <span className="border-2 border-purple-700 px-3 py-1 rounded-full">{props.second}</span>
+                  <IconButton size="small" aria-label="Plus" onClick={() => {
+                    if(props.second !== 99) {
+                      props.setSecond(props.second + 1)
+                    }
+                  }}>
+                    <AddIcon/>
+                  </IconButton>
+                </div>
+                <Box sx={{height: 26, textAlign: "center"}}> SECONDS</Box>
               </Grid>
             </Stack>
           </Grid>

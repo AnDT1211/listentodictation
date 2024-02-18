@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DescriptionIcon from "@mui/icons-material/Description";
 import TextField from "@mui/material/TextField";
 
-export default function DialogTranscriptRegister(props) {
+export default function DialogTranscriptLinkRegister(props) {
   const isMobile = typeof window !== "undefined" && window.innerWidth <= 767;
   const [open, setOpen] = React.useState(false);
   const [transcriptContent, setTranscriptContent] = React.useState("");
@@ -28,7 +28,7 @@ export default function DialogTranscriptRegister(props) {
 
   return (
     <React.Fragment>
-      <Button component="label" variant="outlined" startIcon={<DescriptionIcon/>}
+      <Button component="label" variant="outlined" startIcon={<DescriptionIcon/>} sx={{marginRight: "1rem"}}
               onClick={handleClickOpen}>
         {/*Upload Transcript*/}
         Transcript
@@ -59,7 +59,7 @@ export default function DialogTranscriptRegister(props) {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit}>
-            Add Transcript
+            Update
           </Button>
         </DialogActions>
       </Dialog>

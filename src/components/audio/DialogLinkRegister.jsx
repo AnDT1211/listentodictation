@@ -7,11 +7,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import DescriptionIcon from "@mui/icons-material/Description";
 import TextField from "@mui/material/TextField";
+import LinkIcon from "@mui/icons-material/Link";
 
-export default function DialogTranscriptRegister(props) {
+export default function DialogLinkRegister(props) {
   const isMobile = typeof window !== "undefined" && window.innerWidth <= 767;
   const [open, setOpen] = React.useState(false);
   const [transcriptContent, setTranscriptContent] = React.useState("");
+  const [link, setLink] = React.useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -23,15 +25,15 @@ export default function DialogTranscriptRegister(props) {
 
   const handleSubmit = () => {
     handleClose();
-    props.addTranscript(transcriptContent);
+    // props.addTranscript(transcriptContent);
+    props.setLink(link);
   }
 
   return (
     <React.Fragment>
-      <Button component="label" variant="outlined" startIcon={<DescriptionIcon/>}
+      <Button component="label" variant="outlined" startIcon={<LinkIcon/>} sx={{marginRight: "1rem"}}
               onClick={handleClickOpen}>
-        {/*Upload Transcript*/}
-        Transcript
+        Youtube
       </Button>
       <Dialog
         open={open}
@@ -40,26 +42,27 @@ export default function DialogTranscriptRegister(props) {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          Transcript Register
+          Youtube Link
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description" minWidth={isMobile ? 300 : 500}>
-            <TextField
-              autoFocus
-              id="outlined-multiline-flexible"
-              multiline
-              minRows={10}
-              maxRows={20}
-              fullWidth
-              value={transcriptContent}
-              onChange={(e) => setTranscriptContent(e.target.value)}
-            />
+          <DialogContentText autoFocus={true} id="alert-dialog-description" minWidth={isMobile ? 300 : 500}>
+            <TextField autoFocus={true} value={link} onChange={(e) => {setLink(e.target.value)}} id="outlined-basic" variant="outlined" fullWidth={true}/>
+            {/*<TextField*/}
+            {/*  autoFocus*/}
+            {/*  id="outlined-multiline-flexible"*/}
+            {/*  multiline*/}
+            {/*  minRows={10}*/}
+            {/*  maxRows={20}*/}
+            {/*  fullWidth*/}
+            {/*  value={transcriptContent}*/}
+            {/*  onChange={(e) => setTranscriptContent(e.target.value)}*/}
+            {/*/>*/}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit}>
-            Add Transcript
+            Add Link
           </Button>
         </DialogActions>
       </Dialog>

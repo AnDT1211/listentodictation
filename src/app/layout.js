@@ -1,6 +1,7 @@
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Grid from "@mui/material/Grid";
+import Link from "next/link";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -15,7 +16,9 @@ export default function RootLayout({children}) {
     <body className={inter.className}>
     <div className="container my-5 mx-auto">
       <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center">
-        <p className="text-center text-4xl">Listen To Dictation</p>
+        <Link href="/">
+          <p className="text-center text-4xl">Listen To Dictation</p>
+        </Link>
       </Grid>
       {children}
     </div>
